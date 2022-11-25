@@ -2,7 +2,7 @@ import requests
 import config
 headers = {"Token":config.ESP_token}
 
-
+#print(requests.get("https://developer.sepush.co.za/business/2.0/api_allowance", headers=headers).json())
 def getStageInfo():
     response = requests.get("https://developer.sepush.co.za/business/2.0/status", headers=headers)
     return response.json()

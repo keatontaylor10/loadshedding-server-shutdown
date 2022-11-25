@@ -3,42 +3,41 @@ import datetime
 import os
 from apscheduler.schedulers.blocking import BlockingScheduler
 
-next_loadshed = None
+currentlyScheduledShutdown = None
+
 def main():
     checkSchedule()
-    checkShutdown()
     scheduler = BlockingScheduler()
     scheduler.add_job(checkSchedule, 'interval', minutes = config.schedule_interval)
-    scheduler.add_job(checkShutdown, 'interval', minutes = config.shutdown_interval)
     scheduler.start()
     
 def checkSchedule():
-    global next_loadshed
-    event = app_requests.areaInfo(config.area_code)["events"][0]
-    if event is None:
-        next_loadshed = None
+    events = app_requests.areaInfo(config.area_code)["events"]
+    global currentlyScheduledShutdown
+    now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=2)))
+
+    #no loadshed scheduled :) (unlikely to occur...)
+    if events[0] is None:
+        if currentlyScheduledShutdown is not None:
+            os.system("shutdown -c")
         return
-    time = datetime.datetime.fromisoformat(event["start"])
-    #timediff = time-datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=2)))
+
+    #wont run if no events
+    for event in events:
+        time = datetime.datetime.fromisoformat(event["start"])
+        if now > datetime.datetime.fromisoformat(event["end"]) or now > time:
+            continue
     
-    next_loadshed = time
+        
+        newScheduledShutdown = str(time.hour-1) + ":" + str(60-config.shutdown_delta)
+        if newScheduledShutdown == currentlyScheduledShutdown:
+            return
+        currentlyScheduledShutdown = newScheduledShutdown
+        print("Scheduling a shutdown for " + currentlyScheduledShutdown)
+        #print("shutdown -P " + currentlyScheduledShutdown + " \"Shutting down due to scheduled loadshedding!\"")
+        os.system("shutdown -P " + currentlyScheduledShutdown + " \"Shutting down due to scheduled loadshedding!\"")
 
-def checkShutdown():
-    if next_loadshed is None:
-        print('none')
-        return
-
-
-    if next_loadshed-datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=2)))  <= datetime.timedelta(minutes=config.shutdown_delta):
-        print("shutting down")
-        #print(next_loadshed-datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=2))))
-        os.system("shutdown now \" Shutting down for Loadshedding  :( \" ")
-
-    else:
-        print("not shutting down")
-       # print(next_loadshed-datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=2))))
-
-
+    
 
 if __name__ == '__main__':
     main()

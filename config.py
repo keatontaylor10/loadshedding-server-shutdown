@@ -1,5 +1,8 @@
-area_code = "westerncape-2-universityofstellenbosch"
-ESP_token = "C098C571-28344938-97AC0369-F03F1097"
-schedule_interval = 60
-shutdown_interval = 4
+#Area code id from EskomSePush
+area_code = ""
+#EskomSePush API Key
+ESP_token = ""
+#Number of minutes to wait before checking ESP schedule again
+schedule_interval = 30
+#Number of minutes before loadshedding to schedule shutdown
 shutdown_delta = 5
