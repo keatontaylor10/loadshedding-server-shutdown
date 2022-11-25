@@ -1,7 +1,6 @@
 import requests
-import json
-
-headers = {"Token":"C098C571-28344938-97AC0369-F03F1097"}
+import config
+headers = {"Token":config.ESP_token}
 
 
 def getStageInfo():
@@ -14,14 +13,6 @@ def areaSearch(area):
 
 
 def areaInfo(area_code):
-    response = requests.get("https://developer.sepush.co.za/business/2.0/area?id=" + area_code , headers=headers)
+    response = requests.get("https://developer.sepush.co.za/business/2.0/area?id=" + area_code   , headers=headers)
     return response.json()
-
-
-print(areaInfo("westerncape-2-universityofstellenbosch")["events"])
-
-
-
-
-
 
