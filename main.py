@@ -28,14 +28,18 @@ def checkSchedule():
         if now > datetime.datetime.fromisoformat(event["end"]) or now > time:
             continue
     
-        
-        newScheduledShutdown = str(time.hour-1) + ":" + str(60-config.shutdown_delta)
+        if time.hour == 0:
+            hour = str(23)
+        else:
+            hour = str(time.hour-1)
+        newScheduledShutdown = hour + ":" + str(60-config.shutdown_delta)
         if newScheduledShutdown == currentlyScheduledShutdown:
             return
         currentlyScheduledShutdown = newScheduledShutdown
         print("Scheduling a shutdown for " + currentlyScheduledShutdown)
         #print("shutdown -P " + currentlyScheduledShutdown + " \"Shutting down due to scheduled loadshedding!\"")
         os.system("shutdown -P " + currentlyScheduledShutdown + " \"Shutting down due to scheduled loadshedding!\"")
+        break
 
     
 
