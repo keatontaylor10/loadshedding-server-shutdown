@@ -25,9 +25,14 @@ def checkSchedule():
     #wont run if no events
     for event in events:
         time = datetime.datetime.fromisoformat(event["start"])
+
+
         if now > datetime.datetime.fromisoformat(event["end"]) or now > time:
             continue
-    
+
+        if time.day != now.day and time.hour != 0 :
+            continue
+
         if time.hour == 0:
             hour = str(23)
         else:
