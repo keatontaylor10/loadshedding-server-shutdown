@@ -12,15 +12,23 @@ def main():
     scheduler.start()
     
 def checkSchedule():
+    print("Checking schedule")
     events = app_requests.areaInfo(config.area_code)["events"]
     global currentlyScheduledShutdown
     now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=2)))
+    # hacky fix to make sure changing schedules doesn't fuck it up 
+    # Reset and check again
 
-    #no loadshed scheduled :) (unlikely to occur...)
+    print("Clearing scheduled shutdowns")
+    os.system("shutdown -c")
+
+    # no loadshed scheduled :) (unlikely to occur...)
     if events[0] is None:
-        if currentlyScheduledShutdown is not None:
-            os.system("shutdown -c")
+        print("nothing schdeduled, ending")
         return
+
+
+
 
     #wont run if no events
     for event in events:
